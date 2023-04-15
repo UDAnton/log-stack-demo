@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_pass
+      - MYSQL_DATABASE=log_demo
+    volumes:
+      - ./config/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+      - ./logs/mysql:/var/log/mysql
+    ports:
+      - '3306:3306'
+
+  elk:
+    image: sebp/elk:8.6.2
+    container_name: elk
+    environment:
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+      - LOGSTASH_START=1
+      - KIBANA_START=1
+      - ELASTICSEARCH_START=1
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+
+  filebeat-elk:
+    image: docker.elastic.co/beats/filebeat:8.6.2
+    container_name: filebeat-elk
+    volumes:
+      - ./config/filebeat-elk.yaml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs/mysql:/var/log/mysql:ro
+    environment:
+      - ELASTICSEARCH_HOSTS=elk:9200
+      - KIBANA_HOST=elk:5601
+      - ELASTICSEARCH_USERNAME=
+      - ELASTICSEARCH_PASSWORD=
+    depends_on:
+      - elk
+      - mysql

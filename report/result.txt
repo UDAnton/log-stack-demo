@@ -1,0 +1,11 @@
+Run SQL queries with different long_query_time property. Repeats: 3, number of queries: 10
+Query: SELECT * FROM users ORDER BY birth_year DESC LIMIT 50000
+
+1. SET GLOBAL long_query_time = 10
+Result: 1.3089471516s, 1.3722850236000002s, 1.3852859722000002s
+
+2. SET GLOBAL long_query_time = 1
+Result: 1.2436999566999993s, 1.2445695400000005s, 1.2439035747000005s
+
+3. SET GLOBAL long_query_time = 0
+Result: 1.2279076075000006s, 1.2568538099000008s, 1.2234499717999996s
